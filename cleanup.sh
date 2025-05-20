@@ -35,20 +35,6 @@ if [  -d "$UPLOAD_DIR" ]; then
     git add "$UPLOAD_DIR/done.flag" "$UPLOAD_DIR/firmware.bin"
     git commit -m "Xóa done.flag và firmware.bin" || echo "Không có thay đổi để commit"
     git push origin master || { echo "Push xóa file thất bại"; exit 1; }
-    # Làm mới cache CDN bằng cách thêm và xóa file giả
-    echo "Bắt đầu làm mới cache CDN..."
-    echo "test" > "$UPLOAD_DIR/dummy.txt"
-    git add "$UPLOAD_DIR/dummy.txt"
-    git commit -m "Thêm file giả để làm mới cache CDN" || echo "Không có thay đổi để commit"
-    git push origin master || { echo "Push file giả thất bại"; exit 1; }
-    echo "Đã thêm file giả dummy.txt"
-
-    rm -f "$UPLOAD_DIR/dummy.txt"
-    git add "$UPLOAD_DIR/dummy.txt"
-    git commit -m "Xóa file giả để làm mới cache CDN" || echo "Không có thay đổi để commit"
-    git push origin master || { echo "Push xóa file giả thất bại"; exit 1; }
-    echo "Đã xóa file giả dummy.txt"
-    echo "Hoàn tất làm mới cache CDN"
   else
     echo "Không tìm thấy done.flag hoặc firmware.bin trong thư mục $UPLOAD_DIR"
   fi
