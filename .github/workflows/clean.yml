@@ -1,0 +1,29 @@
+name: Cleanup Files
+
+on:
+  push:
+    paths:
+      - "uploads/**" # Chạy khi có thay đổi trong thư mục upload
+  workflow_dispatch: # Cho phép chạy thủ công
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cleanup-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run cleanup script
+        run: bash cleanup.sh
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "Delete done.flag và firmware.bin" || echo "No change to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
