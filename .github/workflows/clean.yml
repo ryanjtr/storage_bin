@@ -1,3 +1,32 @@
+# name: Cleanup Files
+
+# on:
+#   push:
+#     paths:
+#       - "uploads/**" # Chạy khi có thay đổi trong thư mục upload
+#   workflow_dispatch: # Cho phép chạy thủ công
+# jobs:
+#   cleanup:
+#     runs-on: ubuntu-latest
+#     concurrency:
+#       group: cleanup-${{ github.ref }}
+#       cancel-in-progress: false
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+
+#       - name: Run cleanup script
+#         run: bash cleanup.sh
+
+#         # - name: Commit changes
+#         #   run: |
+#         #     git config --local user.email "github-actions[bot]@users.noreply.github.com"
+#         #     git config --local user.name "github-actions[bot]"
+#         #     git add .
+#         #     git commit -m "Delete done.flag và firmware.bin" || echo "No change to commit"
+#         #     git push
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 name: Cleanup Files
 
 on:
@@ -5,9 +34,12 @@ on:
     paths:
       - "uploads/**" # Chạy khi có thay đổi trong thư mục upload
   workflow_dispatch: # Cho phép chạy thủ công
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Cấp quyền ghi cho GITHUB_TOKEN
     concurrency:
       group: cleanup-${{ github.ref }}
       cancel-in-progress: false
@@ -15,15 +47,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run cleanup script
-        run: bash cleanup.sh
+      - name: Set up Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
 
-        # - name: Commit changes
-        #   run: |
-        #     git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        #     git config --local user.name "github-actions[bot]"
-        #     git add .
-        #     git commit -m "Delete done.flag và firmware.bin" || echo "No change to commit"
-        #     git push
+      - name: Run cleanup script
+        run: |
+          chmod +x cleanup.sh
+          bash cleanup.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
